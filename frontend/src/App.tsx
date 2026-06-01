@@ -1,20 +1,28 @@
-// frontend/src/App.tsx
 import { useState } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/useAuth';
 import { Login } from './pages/Login';
-import { Clients } from './pages/Clients'; // Importação da nova página
+import { Clients } from './pages/Clients';
+import { Products } from './pages/Products';
 import { LogOut, Users, Package, FileText, LayoutGrid } from 'lucide-react';
 
 function DashboardPrincipal() {
   const { logout, user } = useAuth();
   const [activePage, setActivePage] = useState<'menu' | 'crm' | 'products' | 'quotes'>('menu');
 
-  // Se o usuário clicar em CRM Clientes, renderiza o componente correspondente
+  // Redirecionamento condicional das telas
   if (activePage === 'crm') {
     return (
       <div className="min-h-screen p-8 md:p-16">
         <Clients onBack={() => setActivePage('menu')} />
+      </div>
+    );
+  }
+
+  if (activePage === 'products') {
+    return (
+      <div className="min-h-screen p-8 md:p-16">
+        <Products onBack={() => setActivePage('menu')} />
       </div>
     );
   }
@@ -47,7 +55,10 @@ function DashboardPrincipal() {
           <h2 className="text-xl font-bold uppercase tracking-tight">CRM Clientes</h2>
         </div>
         
-        <div className="border-2 border-black p-6 bg-white hover:bg-black hover:text-white transition-all cursor-pointer flex flex-col justify-between h-48">
+        <div 
+          onClick={() => setActivePage('products')}
+          className="border-2 border-black p-6 bg-white hover:bg-black hover:text-white transition-all cursor-pointer flex flex-col justify-between h-48"
+        >
           <Package size={32} strokeWidth={2.5} />
           <h2 className="text-xl font-bold uppercase tracking-tight">Catálogo Produtos</h2>
         </div>
