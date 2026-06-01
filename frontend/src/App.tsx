@@ -4,6 +4,7 @@ import { useAuth } from './context/useAuth';
 import { Login } from './pages/Login';
 import { Clients } from './pages/Clients';
 import { Products } from './pages/Products';
+import { Quotes } from './pages/Quotes';
 import { LogOut, Users, Package, FileText, LayoutGrid } from 'lucide-react';
 
 function DashboardPrincipal() {
@@ -12,19 +13,15 @@ function DashboardPrincipal() {
 
   // Redirecionamento condicional das telas
   if (activePage === 'crm') {
-    return (
-      <div className="min-h-screen p-8 md:p-16">
-        <Clients onBack={() => setActivePage('menu')} />
-      </div>
-    );
+    return <div className="min-h-screen p-8 md:p-16"><Clients onBack={() => setActivePage('menu')} /></div>;
   }
 
   if (activePage === 'products') {
-    return (
-      <div className="min-h-screen p-8 md:p-16">
-        <Products onBack={() => setActivePage('menu')} />
-      </div>
-    );
+    return <div className="min-h-screen p-8 md:p-16"><Products onBack={() => setActivePage('menu')} /></div>;
+  }
+
+  if (activePage === 'quotes') {
+    return <div className="min-h-screen p-8 md:p-16"><Quotes onBack={() => setActivePage('menu')} /></div>;
   }
 
   return (
@@ -47,23 +44,20 @@ function DashboardPrincipal() {
 
       {/* Grid de Módulos */}
       <main className="my-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-12">
-        <div 
-          onClick={() => setActivePage('crm')}
-          className="border-2 border-black p-6 bg-white hover:bg-black hover:text-white transition-all cursor-pointer flex flex-col justify-between h-48"
-        >
+        <div onClick={() => setActivePage('crm')} className="border-2 border-black p-6 bg-white hover:bg-black hover:text-white transition-all cursor-pointer flex flex-col justify-between h-48">
           <Users size={32} strokeWidth={2.5} />
           <h2 className="text-xl font-bold uppercase tracking-tight">CRM Clientes</h2>
         </div>
         
-        <div 
-          onClick={() => setActivePage('products')}
-          className="border-2 border-black p-6 bg-white hover:bg-black hover:text-white transition-all cursor-pointer flex flex-col justify-between h-48"
-        >
+        <div onClick={() => setActivePage('products')} className="border-2 border-black p-6 bg-white hover:bg-black hover:text-white transition-all cursor-pointer flex flex-col justify-between h-48">
           <Package size={32} strokeWidth={2.5} />
           <h2 className="text-xl font-bold uppercase tracking-tight">Catálogo Produtos</h2>
         </div>
         
-        <div className="border-2 border-black p-6 bg-white hover:bg-black hover:text-white transition-all cursor-pointer flex flex-col justify-between h-48">
+        <div 
+          onClick={() => setActivePage('quotes')}
+          className="border-2 border-black p-6 bg-white hover:bg-black hover:text-white transition-all cursor-pointer flex flex-col justify-between h-48"
+        >
           <FileText size={32} strokeWidth={2.5} />
           <h2 className="text-xl font-bold uppercase tracking-tight">Orçamentos</h2>
         </div>
