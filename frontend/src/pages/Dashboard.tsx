@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Activity, ArrowLeft, ArrowUpRight, FileText, TrendingUp, Users } from 'lucide-react';
+import { Activity, ArrowLeft, ArrowUpRight, FileText, History, TrendingUp, Users } from 'lucide-react';
+import { useAuth } from '../context/useAuth';
 
 interface DashboardStats {
   total_clientes: number;
@@ -20,15 +21,32 @@ interface DashboardStats {
   }>;
 }
 
+interface AuditLog {
+  id: string;
+  user_name?: string;
+  user_email?: string;
+  action: string;
+  entity_type: string;
+  entity_label?: string;
+  changes?: Record<string, { old?: string | null; new?: string | null }>;
+  created_at: string;
+}
+
 export const Dashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchDashboardData() {
       try {
-        const response = await api.get('/quotes/analytics/summary');
-        setStats(response.data);
+        const [summaryResponse, logsResponse] = await Promise.all([
+          api.get('/quotes/analytics/summary'),
+          user?.role === 'ADM' ? api.get('/audit-logs?limit=20') : Promise.resolve({ data: [] }),
+        ]);
+        setStats(summaryResponse.data);
+        setAuditLogs(logsResponse.data);
       } catch (err) {
         console.error('Erro ao processar metricas do dashboard', err);
       } finally {
@@ -36,10 +54,36 @@ export const Dashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       }
     }
     fetchDashboardData();
-  }, []);
+  }, [user?.role]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(Number(value || 0));
+  };
+
+  const formatDateTime = (value: string) => {
+    return new Intl.DateTimeFormat('pt-BR', {
+      dateStyle: 'short',
+      timeStyle: 'short',
+    }).format(new Date(value));
+  };
+
+  const describeAction = (action: string) => {
+    const labels: Record<string, string> = {
+      client_contact_updated: 'Contato do cliente atualizado',
+    };
+    return labels[action] || action.replaceAll('_', ' ');
+  };
+
+  const describeChanges = (changes?: AuditLog['changes']) => {
+    if (!changes) return 'Sem detalhes de campos.';
+    const labels: Record<string, string> = {
+      contato_email: 'e-mail',
+      contato_whatsapp: 'WhatsApp',
+      contato_telefone: 'telefone',
+    };
+    return Object.entries(changes)
+      .map(([field, values]) => `${labels[field] || field}: ${values.old || '-'} -> ${values.new || '-'}`)
+      .join(' | ');
   };
 
   return (
@@ -134,6 +178,47 @@ export const Dashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               </div>
             </div>
           </div>
+
+          {user?.role === 'ADM' && (
+            <div className="border-2 border-black bg-white p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+              <h3 className="text-sm font-black uppercase tracking-widest border-b-2 border-black pb-2 mb-4 flex items-center gap-2">
+                <History size={16} /> Logs de Auditoria
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-black text-white text-xs font-black uppercase tracking-wider">
+                      <th className="p-3 w-36">Data/Hora</th>
+                      <th className="p-3 w-48">Usuario</th>
+                      <th className="p-3 w-56">Acao</th>
+                      <th className="p-3">Registro</th>
+                      <th className="p-3">Alteracoes</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y-2 divide-black text-xs">
+                    {auditLogs.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="p-4 text-center font-mono text-gray-500 uppercase">Nenhuma edicao registrada.</td>
+                      </tr>
+                    ) : (
+                      auditLogs.map((log) => (
+                        <tr key={log.id} className="hover:bg-gray-50">
+                          <td className="p-3 font-mono">{formatDateTime(log.created_at)}</td>
+                          <td className="p-3">
+                            <div className="font-bold uppercase">{log.user_name || 'Sistema'}</div>
+                            <div className="font-mono text-gray-500">{log.user_email}</div>
+                          </td>
+                          <td className="p-3 font-bold uppercase">{describeAction(log.action)}</td>
+                          <td className="p-3 uppercase">{log.entity_label || log.entity_type}</td>
+                          <td className="p-3 font-mono">{describeChanges(log.changes)}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

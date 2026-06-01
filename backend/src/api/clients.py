@@ -2,10 +2,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from uuid import UUID
 from src.core.database import get_db
+from src.models.audit_log import AuditLog
 from src.models.client import Client
-from src.schemas.client import ClientCreate, ClientResponse
+from src.models.user import User
+from src.schemas.client import ClientContactUpdate, ClientCreate, ClientResponse
 from src.services.cnpj import CNPJService
+from src.services.auth import AuthService
 
 router = APIRouter(prefix="/clients", tags=["Clientes"])
 
@@ -55,3 +59,51 @@ def cadastrar_cliente(payload: ClientCreate, db: Session = Depends(get_db)):
 def listar_clientes(db: Session = Depends(get_db)):
     """Retorna todos os clientes cadastrados na base compartilhada."""
     return db.query(Client).filter(Client.is_active == True).all()
+
+
+@router.patch("/{client_id}/contact", response_model=ClientResponse)
+def atualizar_contato_cliente(
+    client_id: UUID,
+    payload: ClientContactUpdate,
+    db: Session = Depends(get_db),
+    current_user=Depends(AuthService.obter_usuario_logado),
+):
+    """Atualiza apenas e-mail e telefones de contato. Cliente cadastrado nunca é removido por esta rota."""
+    client = db.query(Client).filter(Client.id == client_id, Client.is_active == True).first()
+    if not client:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cliente não encontrado.")
+
+    actor = db.query(User).filter(User.email == current_user.email, User.is_active == True).first()
+    if not actor:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Usuário não autorizado.")
+
+    allowed_fields = ("contato_email", "contato_whatsapp", "contato_telefone")
+    changes = {}
+
+    for field in allowed_fields:
+        new_value = getattr(payload, field)
+        if new_value is None:
+            continue
+
+        old_value = getattr(client, field)
+        if old_value != new_value:
+            changes[field] = {"old": old_value, "new": new_value}
+            setattr(client, field, new_value)
+
+    if not changes:
+        return client
+
+    log = AuditLog(
+        user_id=actor.id,
+        user_name=actor.name,
+        user_email=actor.email,
+        action="client_contact_updated",
+        entity_type="client",
+        entity_id=str(client.id),
+        entity_label=client.razao_social,
+        changes=changes,
+    )
+    db.add(log)
+    db.commit()
+    db.refresh(client)
+    return client

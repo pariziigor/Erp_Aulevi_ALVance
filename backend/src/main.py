@@ -1,11 +1,12 @@
-# backend/src/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.core.config import settings
+
+from src.api.audit_logs import router as audit_logs_router
+from src.api.auth import router as auth_router
 from src.api.clients import router as clients_router
 from src.api.products import router as products_router
-from src.api.auth import router as auth_router
-from src.api.quotes import router as quotes_router # Importando o novo router de orçamentos
+from src.api.quotes import router as quotes_router
+from src.core.config import settings
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION)
 
@@ -17,11 +18,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Registrando a malha completa de rotas da API
 app.include_router(auth_router, prefix="/api")
 app.include_router(clients_router, prefix="/api")
 app.include_router(products_router, prefix="/api")
-app.include_router(quotes_router, prefix="/api") # Ativando o core engine
+app.include_router(quotes_router, prefix="/api")
+app.include_router(audit_logs_router, prefix="/api")
+
 
 @app.get("/")
 def root():

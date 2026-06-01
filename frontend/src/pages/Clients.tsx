@@ -1,21 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import api from '../services/api';
-import { ArrowLeft, Loader2, Plus } from 'lucide-react';
+import { ArrowLeft, Edit3, Filter, Loader2, Plus, Save, Search, X } from 'lucide-react';
 
 interface Client {
   id: string;
   cnpj: string;
   razao_social: string;
+  nome_fantasia?: string;
   cidade: string;
   uf: string;
   contato_nome: string;
+  contato_email: string;
   contato_whatsapp: string;
+  contato_telefone?: string;
 }
 
 export const Clients: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [search, setSearch] = useState('');
+  const [ufFilter, setUfFilter] = useState('ALL');
+
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [editEmail, setEditEmail] = useState('');
+  const [editWhatsapp, setEditWhatsapp] = useState('');
+  const [editTelefone, setEditTelefone] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const [cnpj, setCnpj] = useState('');
   const [razaoSocial, setRazaoSocial] = useState('');
@@ -34,6 +45,7 @@ export const Clients: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const [loadingCnpj, setLoadingCnpj] = useState(false);
   const [errorForm, setErrorForm] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchClients();
@@ -49,6 +61,27 @@ export const Clients: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       setLoading(false);
     }
   }
+
+  const availableUfs = useMemo(() => {
+    return Array.from(new Set(clients.map((client) => client.uf).filter(Boolean))).sort();
+  }, [clients]);
+
+  const filteredClients = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return clients.filter((client) => {
+      const matchesSearch = !term || [
+        client.cnpj,
+        client.razao_social,
+        client.nome_fantasia,
+        client.cidade,
+        client.contato_nome,
+        client.contato_email,
+        client.contato_whatsapp,
+      ].some((value) => String(value || '').toLowerCase().includes(term));
+      const matchesUf = ufFilter === 'ALL' || client.uf === ufFilter;
+      return matchesSearch && matchesUf;
+    });
+  }, [clients, search, ufFilter]);
 
   async function handleConsultarCNPJ() {
     const cnpjDigits = cnpj.replace(/\D/g, '');
@@ -78,9 +111,27 @@ export const Clients: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     }
   }
 
+  function resetCreateForm() {
+    setCnpj('');
+    setRazaoSocial('');
+    setNomeFantasia('');
+    setSituacaoCadastral('');
+    setCidade('');
+    setUf('');
+    setCep('');
+    setEndereco('');
+    setNumero('');
+    setBairro('');
+    setContatoNome('');
+    setContatoEmail('');
+    setContatoWhatsapp('');
+    setContatoTelefone('');
+  }
+
   async function handleSalvarCliente(e: React.FormEvent) {
     e.preventDefault();
     setErrorForm(null);
+    setSuccessMessage(null);
 
     const payload = {
       cnpj,
@@ -102,36 +153,57 @@ export const Clients: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     try {
       await api.post('/clients', payload);
       setShowForm(false);
+      setSuccessMessage('Cliente cadastrado ou localizado na base compartilhada.');
+      resetCreateForm();
       fetchClients();
-      setCnpj('');
-      setRazaoSocial('');
-      setNomeFantasia('');
-      setSituacaoCadastral('');
-      setCidade('');
-      setUf('');
-      setCep('');
-      setEndereco('');
-      setNumero('');
-      setBairro('');
-      setContatoNome('');
-      setContatoEmail('');
-      setContatoWhatsapp('');
-      setContatoTelefone('');
     } catch (err) {
       setErrorForm(err instanceof Error ? err.message : 'Erro ao salvar cliente.');
     }
   }
 
+  function openEditClient(client: Client) {
+    setEditingClient(client);
+    setEditEmail(client.contato_email || '');
+    setEditWhatsapp(client.contato_whatsapp || '');
+    setEditTelefone(client.contato_telefone || '');
+    setErrorForm(null);
+    setSuccessMessage(null);
+  }
+
+  async function handleUpdateContact(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingClient) return;
+
+    setSavingEdit(true);
+    setErrorForm(null);
+    setSuccessMessage(null);
+
+    try {
+      await api.patch(`/clients/${editingClient.id}/contact`, {
+        contato_email: editEmail,
+        contato_whatsapp: editWhatsapp,
+        contato_telefone: editTelefone,
+      });
+      setEditingClient(null);
+      setSuccessMessage('Contato do cliente atualizado e registrado no log de auditoria.');
+      fetchClients();
+    } catch (err) {
+      setErrorForm(err instanceof Error ? err.message : 'Erro ao atualizar contato.');
+    } finally {
+      setSavingEdit(false);
+    }
+  }
+
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center border-b-2 border-black pb-4">
+      <div className="flex flex-col gap-4 border-b-2 border-black pb-4 md:flex-row md:items-center md:justify-between">
         <button onClick={onBack} className="flex items-center gap-2 text-xs font-black uppercase tracking-wider hover:underline">
           <ArrowLeft size={16} /> Voltar ao Menu
         </button>
         <h2 className="text-2xl font-black uppercase tracking-tight">Modulo CRM - Gestao de Clientes</h2>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="border-2 border-black bg-black text-white px-4 py-2 text-xs font-black uppercase tracking-wider hover:bg-white hover:text-black transition-all flex items-center gap-2"
+          className="border-2 border-black bg-black text-white px-4 py-2 text-xs font-black uppercase tracking-wider hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2"
         >
           <Plus size={16} /> {showForm ? 'Fechar Form' : 'Novo Cliente'}
         </button>
@@ -140,6 +212,12 @@ export const Clients: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       {errorForm && (
         <div className="border-2 border-black bg-red-50 p-4 text-xs font-mono uppercase text-black">
           [ERRO]: {errorForm}
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="border-2 border-black bg-green-50 p-4 text-xs font-mono uppercase text-black">
+          [OK]: {successMessage}
         </div>
       )}
 
@@ -221,6 +299,32 @@ export const Clients: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         </form>
       )}
 
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <div className="relative md:col-span-3">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-black" size={18} />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar por CNPJ, razao social, cidade, contato, email ou WhatsApp..."
+            className="w-full border-2 border-black p-2 pl-10 text-sm focus:outline-none"
+          />
+        </div>
+        <div className="relative">
+          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-black" size={18} />
+          <select
+            value={ufFilter}
+            onChange={(e) => setUfFilter(e.target.value)}
+            className="w-full border-2 border-black p-2 pl-10 text-sm focus:outline-none bg-white appearance-none font-bold uppercase"
+          >
+            <option value="ALL">Todos os UFs</option>
+            {availableUfs.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {loading ? (
         <div className="text-xs font-mono uppercase text-center py-12">Sincronizando registros da nuvem...</div>
       ) : (
@@ -231,28 +335,77 @@ export const Clients: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <th className="p-3">CNPJ</th>
                 <th className="p-3">Razao Social</th>
                 <th className="p-3">Localizacao</th>
-                <th className="p-3">Contato Responsavel</th>
+                <th className="p-3">Contato</th>
+                <th className="p-3">E-mail</th>
                 <th className="p-3">WhatsApp</th>
+                <th className="p-3 w-20 text-center">Acoes</th>
               </tr>
             </thead>
             <tbody className="divide-y-2 divide-black text-sm">
-              {clients.length === 0 ? (
+              {filteredClients.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-4 text-center font-mono text-xs text-gray-500 uppercase">Nenhum cliente corporativo indexado.</td>
+                  <td colSpan={7} className="p-4 text-center font-mono text-xs text-gray-500 uppercase">Nenhum cliente encontrado para os filtros.</td>
                 </tr>
               ) : (
-                clients.map((client) => (
+                filteredClients.map((client) => (
                   <tr key={client.id} className="hover:bg-gray-50 transition-colors">
                     <td className="p-3 font-mono text-xs">{client.cnpj}</td>
                     <td className="p-3 font-bold uppercase">{client.razao_social}</td>
                     <td className="p-3 text-xs uppercase font-medium">{client.cidade} / {client.uf}</td>
                     <td className="p-3 text-xs">{client.contato_nome}</td>
+                    <td className="p-3 text-xs">{client.contato_email}</td>
                     <td className="p-3 font-mono text-xs">{client.contato_whatsapp}</td>
+                    <td className="p-3 text-center">
+                      <button
+                        type="button"
+                        onClick={() => openEditClient(client)}
+                        className="inline-flex items-center justify-center border-2 border-black p-2 hover:bg-black hover:text-white transition-all"
+                        title="Editar contato"
+                      >
+                        <Edit3 size={16} />
+                      </button>
+                    </td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {editingClient && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <form onSubmit={handleUpdateContact} className="w-full max-w-xl border-4 border-black bg-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-5">
+            <div className="flex items-start justify-between gap-4 border-b-2 border-black pb-3">
+              <div>
+                <h3 className="text-lg font-black uppercase tracking-tight">Editar Contato</h3>
+                <p className="text-xs font-mono uppercase text-gray-500">{editingClient.razao_social}</p>
+              </div>
+              <button type="button" onClick={() => setEditingClient(null)} className="border-2 border-black p-2 hover:bg-black hover:text-white">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-black uppercase mb-2">E-mail</label>
+                <input type="email" required value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="w-full border-2 border-black p-2 text-sm focus:outline-none" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-black uppercase mb-2">WhatsApp</label>
+                  <input type="text" required value={editWhatsapp} onChange={(e) => setEditWhatsapp(e.target.value)} className="w-full border-2 border-black p-2 text-sm focus:outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-black uppercase mb-2">Telefone</label>
+                  <input type="text" value={editTelefone} onChange={(e) => setEditTelefone(e.target.value)} className="w-full border-2 border-black p-2 text-sm focus:outline-none" />
+                </div>
+              </div>
+            </div>
+            <button disabled={savingEdit} type="submit" className="w-full border-2 border-black bg-black p-3 text-xs font-black uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              {savingEdit ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+              Salvar Alteracao
+            </button>
+          </form>
         </div>
       )}
     </div>
