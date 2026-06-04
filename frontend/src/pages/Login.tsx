@@ -51,8 +51,8 @@ export const Login: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md rounded-3xl border border-white/60 bg-white/70 p-7 shadow-2xl shadow-slate-900/10 backdrop-blur-2xl sm:p-10">
+    <div className="page-enter flex min-h-screen items-center justify-center px-4 py-8 will-animate">
+      <div className="modal-slide-up w-full max-w-md rounded-3xl border border-white/60 bg-white/70 p-7 shadow-2xl shadow-slate-900/10 backdrop-blur-2xl sm:p-10">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-lg shadow-orange-500/25">
             <Lock size={22} />
@@ -99,7 +99,7 @@ export const Login: React.FC = () => {
             type="submit"
             isLoading={isSubmitting}
             loadingText="Autenticando..."
-            className="w-full rounded-2xl p-4 text-sm font-extrabold uppercase shadow-xl shadow-orange-500/20 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-orange-500/25"
+            className="button-glow w-full rounded-2xl p-4 text-sm font-extrabold uppercase shadow-xl shadow-orange-500/20 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-orange-500/25"
           >
             Entrar no sistema
           </LoadingButton>

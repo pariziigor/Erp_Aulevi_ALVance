@@ -34,7 +34,7 @@ export function ProductsTable({ loading, products }: ProductsTableProps) {
             </tr>
           ) : (
             products.map((product) => (
-              <tr key={product.id} className="transition-colors hover:bg-orange-50/50">
+              <tr key={product.id} className="row-fade transition-colors hover:bg-orange-50/50">
                 <td className="p-3 font-mono text-xs font-bold">{product.codigo}</td>
                 <td className="p-3">
                   <div className="font-bold uppercase">{product.descricao}</div>

@@ -9,14 +9,14 @@ export function SkeletonRow({ columns = 5, actionColumn = false }: SkeletonRowPr
       {Array.from({ length: columns }).map((_, index) => (
         <td key={index} className="p-3">
           <div
-            className="h-4 animate-pulse rounded-md bg-slate-200"
+            className="skeleton-pulse shimmer-loading h-4 rounded-md bg-slate-200"
             style={{ width: `${index === 1 ? 70 : 38 + ((index * 11) % 24)}%` }}
           />
         </td>
       ))}
       {actionColumn && (
         <td className="p-3 text-center">
-          <div className="mx-auto h-8 w-24 animate-pulse rounded-lg bg-slate-200" />
+          <div className="skeleton-pulse shimmer-loading mx-auto h-8 w-24 rounded-lg bg-slate-200" />
         </td>
       )}
     </tr>
@@ -26,12 +26,12 @@ export function SkeletonRow({ columns = 5, actionColumn = false }: SkeletonRowPr
 export function SkeletonCard() {
   return (
     <div className="space-y-4 rounded-xl border border-slate-200 p-6">
-      <div className="h-6 w-3/4 animate-pulse rounded-md bg-slate-200" />
+      <div className="skeleton-pulse shimmer-loading h-6 w-3/4 rounded-md bg-slate-200" />
       <div className="space-y-2">
-        <div className="h-4 w-full animate-pulse rounded-md bg-slate-200" />
-        <div className="h-4 w-5/6 animate-pulse rounded-md bg-slate-200" />
+        <div className="skeleton-pulse shimmer-loading h-4 w-full rounded-md bg-slate-200" />
+        <div className="skeleton-pulse shimmer-loading h-4 w-5/6 rounded-md bg-slate-200" />
       </div>
-      <div className="h-10 animate-pulse rounded-md bg-slate-200" />
+      <div className="skeleton-pulse shimmer-loading h-10 rounded-md bg-slate-200" />
     </div>
   );
 }
@@ -42,7 +42,7 @@ export function SkeletonText({ lines = 3 }: { lines?: number }) {
       {Array.from({ length: lines }).map((_, index) => (
         <div
           key={index}
-          className="h-4 animate-pulse rounded-md bg-slate-200"
+          className="skeleton-pulse shimmer-loading h-4 rounded-md bg-slate-200"
           style={{ width: index === lines - 1 ? '80%' : '100%' }}
         />
       ))}
@@ -57,6 +57,5 @@ export function SkeletonCircle({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
     lg: 'h-16 w-16',
   };
 
-  return <div className={`${sizeClasses[size]} animate-pulse rounded-full bg-slate-200`} />;
+  return <div className={`${sizeClasses[size]} skeleton-pulse shimmer-loading rounded-full bg-slate-200`} />;
 }
-

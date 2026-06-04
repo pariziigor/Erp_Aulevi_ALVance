@@ -34,7 +34,7 @@ export function UsersTable({ loading, updatingUserId, users, onResetPassword, on
             </tr>
           ) : (
             users.map((systemUser) => (
-              <tr key={systemUser.id} className="transition hover:bg-orange-50/50">
+              <tr key={systemUser.id} className="row-fade transition hover:bg-orange-50/50">
                 <td className="p-3">
                   <div className="font-bold uppercase">{systemUser.name}</div>
                   <div className="font-mono text-xs text-gray-500">{systemUser.email}</div>

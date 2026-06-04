@@ -25,20 +25,14 @@ export function Modal({
       {/* Backdrop */}
       {showBackdrop && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 animate-fade-in"
+          className="modal-backdrop-in fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
           onClick={onClose}
-          style={{
-            animation: 'fadeIn 0.2s ease-out',
-          }}
         ></div>
       )}
 
       {/* Modal */}
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
-        style={{
-          animation: 'modalSlideIn 0.3s ease-out',
-        }}
+        className="modal-slide-up pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4"
       >
         <div
           className={`
@@ -69,28 +63,6 @@ export function Modal({
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        @keyframes modalSlideIn {
-          from {
-            opacity: 0;
-            transform: scale(0.95) translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-          }
-        }
-      `}</style>
     </>
   );
 }
@@ -123,11 +95,8 @@ export function Drawer({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 animate-fade-in"
+        className="modal-backdrop-in fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
-        style={{
-          animation: 'fadeIn 0.2s ease-out',
-        }}
       ></div>
 
       {/* Drawer */}
@@ -140,11 +109,6 @@ export function Drawer({
           border-l border-slate-200
           ${className}
         `}
-        style={{
-          animation: position === 'right'
-            ? 'slideInRight 0.3s ease-out'
-            : 'slideInLeft 0.3s ease-out',
-        }}
       >
         {/* Header */}
         <div className="sticky top-0 flex items-center justify-between border-b border-slate-200 px-6 py-4 bg-white/95 backdrop-blur">
@@ -161,35 +125,6 @@ export function Drawer({
         {/* Content */}
         <div className="px-6 py-4">{children}</div>
       </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        @keyframes slideInRight {
-          from {
-            transform: translateX(100%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes slideInLeft {
-          from {
-            transform: translateX(-100%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-      `}</style>
     </>
   );
 }

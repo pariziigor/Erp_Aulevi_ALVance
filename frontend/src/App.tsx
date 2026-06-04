@@ -15,8 +15,8 @@ import { BarChart3, FileText, LayoutGrid, LogOut, Package, Shield, Users } from 
 function DashboardPrincipal() {
   const { logout, user } = useAuth();
   const [activePage, setActivePage] = useState<'menu' | 'crm' | 'products' | 'quotes' | 'dashboard' | 'adminUsers' | 'sellerDashboard'>('menu');
-  const pageShell = 'min-h-screen px-4 py-6 sm:px-6 md:px-10 lg:px-16 lg:py-12';
-  const moduleCard = 'group flex h-44 cursor-pointer flex-col justify-between rounded-2xl border border-white/60 bg-white/70 p-6 shadow-xl shadow-slate-900/5 backdrop-blur-xl transition-all duration-200 hover:-translate-y-1 hover:border-orange-300/60 hover:bg-white/90 hover:shadow-2xl hover:shadow-orange-500/10';
+  const pageShell = 'page-enter min-h-screen px-4 py-6 will-animate sm:px-6 md:px-10 lg:px-16 lg:py-12';
+  const moduleCard = 'stagger-item hover-lift hover-glow group flex h-44 cursor-pointer flex-col justify-between rounded-2xl border border-white/60 bg-white/70 p-6 shadow-xl shadow-slate-900/5 backdrop-blur-xl transition-all duration-200 hover:border-orange-300/60 hover:bg-white/90 hover:shadow-2xl hover:shadow-orange-500/10';
 
   if (activePage === 'crm') {
     return <div className={pageShell}><Clients onBack={() => setActivePage('menu')} /></div>;
@@ -62,10 +62,10 @@ function DashboardPrincipal() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col justify-between px-4 py-6 sm:px-6 md:px-10 lg:px-16 lg:py-12">
-      <header className="flex flex-col gap-5 rounded-3xl border border-white/60 bg-white/55 p-5 shadow-xl shadow-slate-900/5 backdrop-blur-xl md:flex-row md:items-end md:justify-between">
+    <div className="page-enter flex min-h-screen flex-col justify-between px-4 py-6 will-animate sm:px-6 md:px-10 lg:px-16 lg:py-12">
+      <header className="fade-in-down flex flex-col gap-5 rounded-3xl border border-white/60 bg-white/55 p-5 shadow-xl shadow-slate-900/5 backdrop-blur-xl md:flex-row md:items-end md:justify-between">
         <div>
-          <div className="mb-3 inline-flex rounded-full border border-orange-200 bg-orange-50/80 px-3 py-1 text-[11px] font-bold uppercase text-orange-700">
+          <div className="badge-pop-in mb-3 inline-flex rounded-full border border-orange-200 bg-orange-50/80 px-3 py-1 text-[11px] font-bold uppercase text-orange-700">
             ERP Comercial
           </div>
           <h1 className="text-3xl font-extrabold uppercase text-slate-950 md:text-5xl">AULEVI NEXUS</h1>
@@ -119,7 +119,7 @@ function DashboardPrincipal() {
         )}
       </main>
 
-      <footer className="rounded-full border border-white/60 bg-white/50 px-4 py-3 text-center text-xs font-medium text-slate-500 shadow-sm backdrop-blur">
+      <footer className="fade-in-up rounded-full border border-white/60 bg-white/50 px-4 py-3 text-center text-xs font-medium text-slate-500 shadow-sm backdrop-blur">
         Aulevi Nexus Core v1.0.0 / 2026
       </footer>
     </div>

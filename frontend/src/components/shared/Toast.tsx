@@ -58,25 +58,11 @@ interface ToastContainerProps {
 
 function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
   return (
-    <>
-      <div className="pointer-events-none fixed right-4 top-4 z-50 w-[calc(100vw-2rem)] space-y-2 sm:w-auto">
-        {toasts.map((toast, index) => (
-          <ToastItem key={toast.id} toast={toast} onRemove={onRemove} index={index} />
-        ))}
-      </div>
-      <style>{`
-        @keyframes slideInRight {
-          from {
-            opacity: 0;
-            transform: translateX(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-      `}</style>
-    </>
+    <div className="pointer-events-none fixed right-4 top-4 z-50 w-[calc(100vw-2rem)] space-y-2 sm:w-auto">
+      {toasts.map((toast, index) => (
+        <ToastItem key={toast.id} toast={toast} onRemove={onRemove} index={index} />
+      ))}
+    </div>
   );
 }
 
@@ -110,10 +96,9 @@ function ToastItem({ toast, onRemove, index }: ToastItemProps) {
 
   return (
     <div
-      className={`pointer-events-auto flex w-full items-start gap-3 rounded-xl border p-4 shadow-lg shadow-slate-900/10 backdrop-blur-sm transition-all duration-300 sm:min-w-[300px] sm:max-w-[450px] ${bgColors[toast.type]}`}
+      className={`toast-slide-in pointer-events-auto flex w-full items-start gap-3 rounded-xl border p-4 shadow-lg shadow-slate-900/10 backdrop-blur-sm transition-all duration-300 sm:min-w-[300px] sm:max-w-[450px] ${bgColors[toast.type]}`}
       style={{
-        animation: `slideInRight 0.3s ease-out ${index * 50}ms forwards`,
-        opacity: 0,
+        animationDelay: `${index * 50}ms`,
       }}
     >
       <div className="mt-0.5 flex-shrink-0">{icons[toast.type]}</div>

@@ -30,12 +30,12 @@ export function PasswordInput({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className={`w-full rounded-2xl border border-slate-200 bg-white/80 p-3.5 pl-11 pr-12 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 ${className}`}
+        className={`input-focus w-full rounded-2xl border border-slate-200 bg-white/80 p-3.5 pl-11 pr-12 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 ${className}`}
       />
       <button
         type="button"
         onClick={() => setVisible((current) => !current)}
-        className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-orange-600"
+        className="hover-scale absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-orange-600"
         aria-label={visible ? 'Ocultar senha' : 'Mostrar senha'}
         title={visible ? 'Ocultar senha' : 'Mostrar senha'}
       >
@@ -44,4 +44,3 @@ export function PasswordInput({
     </div>
   );
 }
-

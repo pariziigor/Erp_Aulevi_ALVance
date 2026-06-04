@@ -21,7 +21,7 @@ export function LoadingButton({
   className = '',
   ...props
 }: LoadingButtonProps) {
-  const baseClasses = 'inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200';
+  const baseClasses = 'button-press hover-lift inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200';
 
   const variantClasses = {
     primary: `
@@ -48,7 +48,7 @@ export function LoadingButton({
       {...props}
     >
       {isLoading && (
-        <Loader className="w-4 h-4 animate-spin" />
+        <Loader className="spinner-smooth h-4 w-4" />
       )}
       {showSuccess && !isLoading && (
         <Check className="w-4 h-4 text-green-500" />
@@ -80,7 +80,7 @@ export function InputWithFocus({
       )}
       <input
         className={`
-          w-full px-4 py-2 rounded-lg border-2 border-slate-200
+          input-focus w-full px-4 py-2 rounded-lg border-2 border-slate-200
           bg-white/70 backdrop-blur-sm
           focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-500/10
           transition-all duration-200
@@ -92,7 +92,7 @@ export function InputWithFocus({
         {...props}
       />
       {error && (
-        <p className="mt-1 text-sm text-red-500 font-medium animate-shake">
+        <p className="error-shake mt-1 text-sm font-medium text-red-500">
           {error}
         </p>
       )}
@@ -106,23 +106,5 @@ export function InputWithFocus({
 }
 
 export function FormShakeAnimation() {
-  return (
-    <style>{`
-      @keyframes shake {
-        0%, 100% {
-          transform: translateX(0);
-        }
-        25% {
-          transform: translateX(-5px);
-        }
-        75% {
-          transform: translateX(5px);
-        }
-      }
-
-      .animate-shake {
-        animation: shake 0.4s ease-in-out;
-      }
-    `}</style>
-  );
+  return null;
 }
