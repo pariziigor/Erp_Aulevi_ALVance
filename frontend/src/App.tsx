@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/useAuth';
 import { Login } from './pages/Login';
+import { ChangePassword } from './pages/ChangePassword';
 import { Clients } from './pages/Clients';
 import { Products } from './pages/Products';
 import { Quotes } from './pages/Quotes';
@@ -125,7 +126,7 @@ function DashboardPrincipal() {
 }
 
 function AppContent() {
-  const { signed, loading } = useAuth();
+  const { signed, loading, user } = useAuth();
 
   if (loading) {
     return (
@@ -135,7 +136,11 @@ function AppContent() {
     );
   }
 
-  return signed ? <DashboardPrincipal /> : <Login />;
+  if (!signed) {
+    return <Login />;
+  }
+
+  return user?.must_change_password ? <ChangePassword /> : <DashboardPrincipal />;
 }
 
 function App() {

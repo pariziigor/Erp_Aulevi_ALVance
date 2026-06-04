@@ -7,6 +7,7 @@ interface User {
   name: string;
   email: string;
   role: 'ADM' | 'SELLER';
+  must_change_password: boolean;
 }
 
 interface AuthContextData {
@@ -14,6 +15,7 @@ interface AuthContextData {
   user: User | null;
   loading: boolean;
   login(email: string, password: string): Promise<void>;
+  changePassword(currentPassword: string, newPassword: string): Promise<void>;
   logout(): void;
 }
 
@@ -45,6 +47,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('@AuleviNexus:user', JSON.stringify(userResponse));
   }
 
+  async function changePassword(currentPassword: string, newPassword: string) {
+    const response = await api.post('/auth/password/change', {
+      current_password: currentPassword,
+      new_password: newPassword,
+    });
+    const userResponse = response.data.user;
+    setUser(userResponse);
+    localStorage.setItem('@AuleviNexus:user', JSON.stringify(userResponse));
+  }
+
   function logout() {
     localStorage.removeItem('@AuleviNexus:token');
     localStorage.removeItem('@AuleviNexus:user');
@@ -52,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   return (
-    <AuthContext.Provider value={{ signed: !!user, user, loading: false, login, logout }}>
+    <AuthContext.Provider value={{ signed: !!user, user, loading: false, login, changePassword, logout }}>
       {children}
     </AuthContext.Provider>
   );

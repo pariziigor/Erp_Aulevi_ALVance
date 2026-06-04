@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/useAuth';
 import { Lock, Mail, ShieldAlert } from 'lucide-react';
+import api from '../services/api';
+import { PasswordInput } from '../components/shared/PasswordInput';
 
 export const Login: React.FC = () => {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [recoveryMessage, setRecoveryMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRecovering, setIsRecovering] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setRecoveryMessage(null);
     setIsSubmitting(true);
 
     try {
@@ -21,6 +26,26 @@ export const Login: React.FC = () => {
       setError(errorMessage);
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function handleForgotPassword() {
+    setError(null);
+    setRecoveryMessage(null);
+
+    if (!email) {
+      setError('Informe o e-mail corporativo para recuperar a senha.');
+      return;
+    }
+
+    setIsRecovering(true);
+    try {
+      const response = await api.post('/auth/password/forgot', { email });
+      setRecoveryMessage(response.data.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao solicitar recuperação de senha.');
+    } finally {
+      setIsRecovering(false);
     }
   }
 
@@ -42,6 +67,12 @@ export const Login: React.FC = () => {
           </div>
         )}
 
+        {recoveryMessage && (
+          <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/80 p-4 text-xs font-semibold uppercase text-emerald-700">
+            {recoveryMessage}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="mb-2 block text-xs font-bold uppercase text-slate-600">E-mail corporativo</label>
@@ -60,17 +91,7 @@ export const Login: React.FC = () => {
 
           <div>
             <label className="mb-2 block text-xs font-bold uppercase text-slate-600">Senha de acesso</label>
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="********"
-                className="w-full rounded-2xl border border-slate-200 bg-white/80 p-3.5 pl-11 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10"
-              />
-            </div>
+            <PasswordInput value={password} onChange={setPassword} placeholder="********" />
           </div>
 
           <button
@@ -79,6 +100,15 @@ export const Login: React.FC = () => {
             className="flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-orange-500 to-orange-400 p-4 text-sm font-extrabold uppercase text-white shadow-xl shadow-orange-500/20 transition hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-orange-500/25 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? 'Autenticando...' : 'Entrar no sistema'}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            disabled={isRecovering}
+            className="w-full text-center text-xs font-bold uppercase text-slate-500 transition hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isRecovering ? 'Solicitando apoio...' : 'Esqueci minha senha'}
           </button>
         </form>
       </div>

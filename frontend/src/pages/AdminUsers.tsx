@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import api from '../services/api';
 import { ArrowLeft, Shield } from 'lucide-react';
+import { ResetPasswordModal } from '../components/admin-users/ResetPasswordModal';
 import { UserCreateForm } from '../components/admin-users/UserCreateForm';
 import { UserRecommendations } from '../components/admin-users/UserRecommendations';
 import { UsersTable } from '../components/admin-users/UsersTable';
 import type { SystemUser } from '../components/admin-users/types';
+import api from '../services/api';
 
 export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [usersList, setUsersList] = useState<SystemUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+  const [resettingUser, setResettingUser] = useState<SystemUser | null>(null);
+  const [temporaryPassword, setTemporaryPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,14 +31,14 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       const response = await api.get('/auth/users');
       setUsersList(response.data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao carregar usuários.');
+      setError(err instanceof Error ? err.message : 'Erro ao carregar usuarios.');
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleCreateUser(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleCreateUser(event: React.FormEvent) {
+    event.preventDefault();
     setSaving(true);
     setError(null);
     setMessage(null);
@@ -51,10 +54,10 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       setEmail('');
       setPassword('');
       setRole('SELLER');
-      setMessage('Usuário criado com sucesso e registrado no log de auditoria.');
+      setMessage('Usuario criado com senha temporaria. A troca sera exigida no primeiro acesso.');
       fetchUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao criar usuário.');
+      setError(err instanceof Error ? err.message : 'Erro ao criar usuario.');
     } finally {
       setSaving(false);
     }
@@ -67,10 +70,33 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
     try {
       await api.patch(`/auth/users/${user.id}`, payload);
-      setMessage('Permissão do usuário atualizada e registrada no log de auditoria.');
+      setMessage('Permissao do usuario atualizada e registrada no log de auditoria.');
       fetchUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao atualizar usuário.');
+      setError(err instanceof Error ? err.message : 'Erro ao atualizar usuario.');
+    } finally {
+      setUpdatingUserId(null);
+    }
+  }
+
+  async function handleResetPassword(event: React.FormEvent) {
+    event.preventDefault();
+    if (!resettingUser) return;
+
+    setUpdatingUserId(resettingUser.id);
+    setError(null);
+    setMessage(null);
+
+    try {
+      await api.post(`/auth/users/${resettingUser.id}/password/reset`, {
+        temporary_password: temporaryPassword,
+      });
+      setMessage('Senha temporaria redefinida. O usuario devera troca-la no proximo acesso.');
+      setResettingUser(null);
+      setTemporaryPassword('');
+      fetchUsers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao redefinir senha.');
     } finally {
       setUpdatingUserId(null);
     }
@@ -88,19 +114,10 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         </div>
       </div>
 
-      {error && (
-        <div className="nexus-alert-error">
-          [ERRO]: {error}
-        </div>
-      )}
+      {error && <div className="nexus-alert-error">[ERRO]: {error}</div>}
+      {message && <div className="nexus-alert-success">[OK]: {message}</div>}
 
-      {message && (
-        <div className="nexus-alert-success">
-          [OK]: {message}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <UserCreateForm
           email={email}
           name={name}
@@ -114,16 +131,32 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           onSubmit={handleCreateUser}
         />
 
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           <UsersTable
             loading={loading}
             updatingUserId={updatingUserId}
             users={usersList}
+            onResetPassword={(user) => {
+              setResettingUser(user);
+              setTemporaryPassword('');
+            }}
             onUpdateUser={handleUpdateUser}
           />
           <UserRecommendations />
         </div>
       </div>
+
+      {resettingUser && (
+        <ResetPasswordModal
+          saving={updatingUserId === resettingUser.id}
+          temporaryPassword={temporaryPassword}
+          user={resettingUser}
+          onClose={() => setResettingUser(null)}
+          onPasswordChange={setTemporaryPassword}
+          onSubmit={handleResetPassword}
+        />
+      )}
     </div>
   );
 };
+

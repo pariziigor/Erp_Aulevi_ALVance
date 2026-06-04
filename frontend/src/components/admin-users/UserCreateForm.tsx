@@ -1,5 +1,6 @@
 import { Loader2, Save, UserPlus } from 'lucide-react';
 import type React from 'react';
+import { PasswordInput } from '../shared/PasswordInput';
 import type { SystemUser } from './types';
 
 interface UserCreateFormProps {
@@ -41,8 +42,13 @@ export function UserCreateForm({
         <input required type="email" value={email} onChange={(event) => onEmailChange(event.target.value)} className="w-full border-2 border-black p-2 text-sm focus:outline-none" />
       </div>
       <div>
-        <label className="block text-xs font-black uppercase mb-2">Senha Inicial</label>
-        <input required type="password" minLength={6} value={password} onChange={(event) => onPasswordChange(event.target.value)} className="w-full border-2 border-black p-2 text-sm focus:outline-none" />
+        <label className="block text-xs font-black uppercase mb-2">Senha Temporaria</label>
+        <PasswordInput
+          value={password}
+          onChange={onPasswordChange}
+          minLength={6}
+          className="rounded-none border-2 border-black bg-white p-2 pl-11 text-sm focus:ring-0"
+        />
       </div>
       <div>
         <label className="block text-xs font-black uppercase mb-2">Nível de Permissão</label>
