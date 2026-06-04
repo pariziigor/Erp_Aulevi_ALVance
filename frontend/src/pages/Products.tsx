@@ -1,37 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, Layers } from 'lucide-react';
 import { ProductBulkActions } from '../components/products/ProductBulkActions';
 import { ProductFilters } from '../components/products/ProductFilters';
 import { ProductsTable } from '../components/products/ProductsTable';
+import { useToast } from '../components/shared/Toast';
 import type { Product } from '../components/products/types';
 import { useAuth } from '../context/useAuth';
 import api from '../services/api';
 
 export const Products: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  async function fetchProducts() {
+  const fetchProducts = useCallback(async () => {
     try {
       const response = await api.get('/products');
       setProducts(response.data);
     } catch (err) {
-      console.error('Erro ao buscar catalogo de produtos', err);
+      addToast(err instanceof Error ? err.message : 'Erro ao buscar catalogo de produtos.', 'error');
     } finally {
       setLoading(false);
     }
-  }
+  }, [addToast]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchProducts();
+  }, [fetchProducts]);
 
   const filteredProducts = products.filter((product) => {
     const term = search.toLowerCase();
@@ -55,33 +56,30 @@ export const Products: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   async function handleExportProducts() {
     setExporting(true);
-    setError(null);
-    setMessage(null);
     try {
       const response = await api.get('/products/export', { responseType: 'blob' });
       downloadBlob(
         new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
         'produtos_aulevi.xlsx'
       );
-      setMessage('Planilha de produtos gerada com sucesso.');
+      addToast('Planilha de produtos gerada com sucesso.', 'success');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao exportar produtos.');
+      addToast(err instanceof Error ? err.message : 'Erro ao exportar produtos.', 'error');
     } finally {
       setExporting(false);
     }
   }
 
   async function handleDownloadTemplate() {
-    setError(null);
-    setMessage(null);
     try {
       const response = await api.get('/products/template', { responseType: 'blob' });
       downloadBlob(
         new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
         'modelo_produtos_aulevi.xlsx'
       );
+      addToast('Modelo Excel baixado com sucesso.', 'success');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao baixar modelo da planilha.');
+      addToast(err instanceof Error ? err.message : 'Erro ao baixar modelo da planilha.', 'error');
     }
   }
 
@@ -91,8 +89,6 @@ export const Products: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     if (!file) return;
 
     setImporting(true);
-    setError(null);
-    setMessage(null);
 
     try {
       const response = await api.post('/products/import', file, {
@@ -101,10 +97,10 @@ export const Products: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           'X-Filename': file.name,
         },
       });
-      setMessage(`Carga concluída: ${response.data.criados} criados e ${response.data.atualizados} atualizados.`);
+      addToast(`Carga concluida: ${response.data.criados} criados e ${response.data.atualizados} atualizados.`, 'success');
       await fetchProducts();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao importar produtos.');
+      addToast(err instanceof Error ? err.message : 'Erro ao importar produtos.', 'error');
     } finally {
       setImporting(false);
     }
@@ -132,9 +128,6 @@ export const Products: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         />
       )}
 
-      {error && <div className="nexus-alert-error">[ERRO]: {error}</div>}
-      {message && <div className="nexus-alert-success">[OK]: {message}</div>}
-
       <ProductFilters
         search={search}
         categoryFilter={categoryFilter}
@@ -146,4 +139,3 @@ export const Products: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     </div>
   );
 };
-

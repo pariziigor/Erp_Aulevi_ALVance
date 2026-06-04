@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { KeyRound, ShieldAlert } from 'lucide-react';
+import { LoadingButton } from '../components/shared/FormComponents';
 import { PasswordInput } from '../components/shared/PasswordInput';
 import { useAuth } from '../context/useAuth';
 
@@ -71,13 +72,14 @@ export const ChangePassword: React.FC = () => {
             <PasswordInput value={confirmPassword} onChange={setConfirmPassword} minLength={8} />
           </div>
 
-          <button
+          <LoadingButton
             type="submit"
-            disabled={isSubmitting}
-            className="flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-orange-500 to-orange-400 p-4 text-sm font-extrabold uppercase text-white shadow-xl shadow-orange-500/20 transition hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-orange-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+            isLoading={isSubmitting}
+            loadingText="Alterando senha..."
+            className="w-full rounded-2xl p-4 text-sm font-extrabold uppercase shadow-xl shadow-orange-500/20 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-orange-500/25"
           >
-            {isSubmitting ? 'Alterando senha...' : 'Salvar senha pessoal'}
-          </button>
+            Salvar senha pessoal
+          </LoadingButton>
         </form>
 
         <button
@@ -91,4 +93,3 @@ export const ChangePassword: React.FC = () => {
     </div>
   );
 };
-

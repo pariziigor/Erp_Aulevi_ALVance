@@ -1,5 +1,6 @@
-import { Loader2, Save, UserPlus } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import type React from 'react';
+import { LoadingButton } from '../shared/FormComponents';
 import { PasswordInput } from '../shared/PasswordInput';
 import type { SystemUser } from './types';
 
@@ -57,10 +58,9 @@ export function UserCreateForm({
           <option value="ADM">Administrador</option>
         </select>
       </div>
-      <button disabled={saving} type="submit" className="nexus-primary-button w-full py-3">
-        {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+      <LoadingButton isLoading={saving} loadingText="Criando acesso..." type="submit" className="w-full py-3">
         Criar Acesso
-      </button>
+      </LoadingButton>
     </form>
   );
 }

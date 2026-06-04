@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/useAuth';
+import { ToastProvider } from './components/shared/Toast';
 import { Login } from './pages/Login';
 import { ChangePassword } from './pages/ChangePassword';
 import { Clients } from './pages/Clients';
@@ -145,9 +146,11 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 

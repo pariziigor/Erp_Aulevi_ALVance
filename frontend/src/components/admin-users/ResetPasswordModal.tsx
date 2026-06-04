@@ -1,6 +1,8 @@
-import { Check, Copy, Loader2, RefreshCw, Save, X } from 'lucide-react';
+import { Check, Copy, RefreshCw } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
+import { LoadingButton } from '../shared/FormComponents';
+import { Modal } from '../shared/Modal';
 import { PasswordInput } from '../shared/PasswordInput';
 import type { SystemUser } from './types';
 
@@ -48,22 +50,19 @@ export function ResetPasswordModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/30 px-4 backdrop-blur-sm">
-      <form onSubmit={onSubmit} className="w-full max-w-md rounded-3xl border border-white/60 bg-white p-6 shadow-2xl shadow-slate-900/20">
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-extrabold uppercase text-slate-950">Redefinir senha</h3>
-            <p className="mt-1 text-xs font-semibold uppercase text-slate-500">{user.name} / {user.email}</p>
-          </div>
-          <button type="button" onClick={onClose} className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:border-orange-300 hover:text-orange-600">
-            <X size={16} />
-          </button>
+    <Modal isOpen onClose={onClose} title="Redefinir senha" className="max-w-md">
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div className="rounded-xl border border-orange-100 bg-orange-50/70 p-3">
+          <p className="text-xs font-bold uppercase text-orange-700">{user.name}</p>
+          <p className="mt-1 font-mono text-xs text-slate-600">{user.email}</p>
         </div>
 
-        <label className="mb-2 block text-xs font-bold uppercase text-slate-600">Nova senha temporária</label>
-        <PasswordInput value={temporaryPassword} onChange={onPasswordChange} minLength={6} />
+        <div>
+          <label className="mb-2 block text-xs font-bold uppercase text-slate-600">Nova senha temporária</label>
+          <PasswordInput value={temporaryPassword} onChange={onPasswordChange} minLength={6} />
+        </div>
 
-        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <button type="button" onClick={handleGeneratePassword} className="nexus-secondary-button justify-center px-3 py-2">
             <RefreshCw size={16} /> Gerar senha
           </button>
@@ -73,16 +72,15 @@ export function ResetPasswordModal({
           </button>
         </div>
 
-        <p className="mt-3 text-xs font-medium text-slate-500">
+        <p className="text-xs font-medium text-slate-500">
           Envie essa senha temporária ao usuário. Após entrar com ela, ele será obrigado a definir uma senha pessoal.
         </p>
 
-        <button disabled={saving} type="submit" className="nexus-primary-button mt-5 w-full py-3">
-          {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+        <LoadingButton isLoading={saving} loadingText="Salvando senha..." type="submit" className="w-full py-3">
           Salvar senha temporária
-        </button>
+        </LoadingButton>
       </form>
-    </div>
+    </Modal>
   );
 }
 

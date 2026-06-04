@@ -1,4 +1,5 @@
 import type { Product } from './types';
+import { SkeletonRow } from '../shared/Skeleton';
 
 interface ProductsTableProps {
   loading: boolean;
@@ -8,14 +9,6 @@ interface ProductsTableProps {
 const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
 export function ProductsTable({ loading, products }: ProductsTableProps) {
-  if (loading) {
-    return (
-      <div className="nexus-panel py-12 text-center text-xs font-semibold uppercase text-slate-500">
-        Sincronizando catalogo com o banco central...
-      </div>
-    );
-  }
-
   return (
     <div className="nexus-table-wrap">
       <table className="w-full text-left">
@@ -29,7 +22,11 @@ export function ProductsTable({ loading, products }: ProductsTableProps) {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-200 text-sm">
-          {products.length === 0 ? (
+          {loading ? (
+            Array.from({ length: 6 }).map((_, index) => (
+              <SkeletonRow key={index} columns={5} />
+            ))
+          ) : products.length === 0 ? (
             <tr>
               <td colSpan={5} className="p-4 text-center font-mono text-xs uppercase text-gray-500">
                 Nenhum produto correspondente aos filtros de busca.
@@ -64,4 +61,3 @@ export function ProductsTable({ loading, products }: ProductsTableProps) {
     </div>
   );
 }
-

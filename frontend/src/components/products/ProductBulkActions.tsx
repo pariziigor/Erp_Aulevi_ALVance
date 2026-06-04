@@ -1,4 +1,5 @@
-import { Download, FileDown, Loader2, Upload } from 'lucide-react';
+import { FileDown, Loader2, Upload } from 'lucide-react';
+import { LoadingButton } from '../shared/FormComponents';
 
 interface ProductBulkActionsProps {
   exporting: boolean;
@@ -27,10 +28,16 @@ export function ProductBulkActions({
         <button type="button" onClick={onDownloadTemplate} className="nexus-secondary-button">
           <FileDown size={16} /> Modelo Excel
         </button>
-        <button type="button" onClick={onExportProducts} disabled={exporting} className="nexus-secondary-button">
-          {exporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+        <LoadingButton
+          type="button"
+          onClick={onExportProducts}
+          isLoading={exporting}
+          loadingText="Exportando..."
+          variant="secondary"
+          className="rounded-full px-4 py-2 text-xs font-bold uppercase"
+        >
           Exportar Excel
-        </button>
+        </LoadingButton>
         <label className="nexus-primary-button cursor-pointer">
           {importing ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
           Importar Excel
@@ -46,4 +53,3 @@ export function ProductBulkActions({
     </div>
   );
 }
-

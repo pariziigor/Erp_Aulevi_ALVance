@@ -1,47 +1,46 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { ResetPasswordModal } from '../components/admin-users/ResetPasswordModal';
 import { UserCreateForm } from '../components/admin-users/UserCreateForm';
 import { UserRecommendations } from '../components/admin-users/UserRecommendations';
 import { UsersTable } from '../components/admin-users/UsersTable';
+import { useToast } from '../components/shared/Toast';
 import type { SystemUser } from '../components/admin-users/types';
 import api from '../services/api';
 
 export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  const { addToast } = useToast();
   const [usersList, setUsersList] = useState<SystemUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
   const [resettingUser, setResettingUser] = useState<SystemUser | null>(null);
   const [temporaryPassword, setTemporaryPassword] = useState('');
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<SystemUser['role']>('SELLER');
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  async function fetchUsers() {
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await api.get('/auth/users');
       setUsersList(response.data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao carregar usuarios.');
+      addToast(err instanceof Error ? err.message : 'Erro ao carregar usuarios.', 'error');
     } finally {
       setLoading(false);
     }
-  }
+  }, [addToast]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchUsers();
+  }, [fetchUsers]);
 
   async function handleCreateUser(event: React.FormEvent) {
     event.preventDefault();
     setSaving(true);
-    setError(null);
-    setMessage(null);
 
     try {
       await api.post('/auth/users', {
@@ -54,10 +53,10 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       setEmail('');
       setPassword('');
       setRole('SELLER');
-      setMessage('Usuario criado com senha temporaria. A troca sera exigida no primeiro acesso.');
+      addToast('Usuario criado com senha temporaria. A troca sera exigida no primeiro acesso.', 'success');
       fetchUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao criar usuario.');
+      addToast(err instanceof Error ? err.message : 'Erro ao criar usuario.', 'error');
     } finally {
       setSaving(false);
     }
@@ -65,15 +64,13 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   async function handleUpdateUser(user: SystemUser, payload: Partial<Pick<SystemUser, 'role' | 'is_active'>>) {
     setUpdatingUserId(user.id);
-    setError(null);
-    setMessage(null);
 
     try {
       await api.patch(`/auth/users/${user.id}`, payload);
-      setMessage('Permissao do usuario atualizada e registrada no log de auditoria.');
+      addToast('Permissao do usuario atualizada e registrada no log de auditoria.', 'success');
       fetchUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao atualizar usuario.');
+      addToast(err instanceof Error ? err.message : 'Erro ao atualizar usuario.', 'error');
     } finally {
       setUpdatingUserId(null);
     }
@@ -84,19 +81,17 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     if (!resettingUser) return;
 
     setUpdatingUserId(resettingUser.id);
-    setError(null);
-    setMessage(null);
 
     try {
       await api.post(`/auth/users/${resettingUser.id}/password/reset`, {
         temporary_password: temporaryPassword,
       });
-      setMessage('Senha temporaria redefinida. O usuario devera troca-la no proximo acesso.');
+      addToast('Senha temporaria redefinida. O usuario devera troca-la no proximo acesso.', 'success');
       setResettingUser(null);
       setTemporaryPassword('');
       fetchUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao redefinir senha.');
+      addToast(err instanceof Error ? err.message : 'Erro ao redefinir senha.', 'error');
     } finally {
       setUpdatingUserId(null);
     }
@@ -113,9 +108,6 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <Shield size={14} /> Acesso ADM
         </div>
       </div>
-
-      {error && <div className="nexus-alert-error">[ERRO]: {error}</div>}
-      {message && <div className="nexus-alert-success">[OK]: {message}</div>}
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <UserCreateForm
@@ -159,4 +151,3 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     </div>
   );
 };
-

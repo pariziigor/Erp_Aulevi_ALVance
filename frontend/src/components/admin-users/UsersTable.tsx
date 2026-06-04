@@ -1,4 +1,5 @@
 import type { SystemUser } from './types';
+import { SkeletonRow } from '../shared/Skeleton';
 
 interface UsersTableProps {
   loading: boolean;
@@ -22,11 +23,9 @@ export function UsersTable({ loading, updatingUserId, users, onResetPassword, on
         </thead>
         <tbody className="divide-y divide-slate-200 text-sm">
           {loading ? (
-            <tr>
-              <td colSpan={4} className="p-4 text-center font-mono text-xs uppercase text-gray-500">
-                Carregando usuários...
-              </td>
-            </tr>
+            Array.from({ length: 5 }).map((_, index) => (
+              <SkeletonRow key={index} columns={3} actionColumn />
+            ))
           ) : users.length === 0 ? (
             <tr>
               <td colSpan={4} className="p-4 text-center font-mono text-xs uppercase text-gray-500">
