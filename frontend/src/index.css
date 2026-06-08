@@ -86,6 +86,8 @@ body {
   --app-ink: #172033;
   --app-muted: #64748b;
   --app-line: rgba(15, 23, 42, 0.1);
+  --app-input: rgba(255, 255, 255, 0.76);
+  --app-grid: rgba(15, 23, 42, 0.035);
   --app-surface: rgba(255, 255, 255, 0.74);
   --app-surface-strong: rgba(255, 255, 255, 0.9);
   --app-orange: #f97316;
@@ -95,8 +97,25 @@ body {
   --app-shadow-soft: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
 
+html[data-theme="dark"] {
+  --app-bg: #090c12;
+  --app-ink: #edf2f7;
+  --app-muted: #94a3b8;
+  --app-line: rgba(148, 163, 184, 0.18);
+  --app-input: rgba(15, 23, 42, 0.86);
+  --app-grid: rgba(148, 163, 184, 0.055);
+  --app-surface: rgba(17, 24, 39, 0.78);
+  --app-surface-strong: rgba(24, 33, 48, 0.94);
+  --app-orange: #fb923c;
+  --app-orange-dark: #f97316;
+  --app-orange-soft: rgba(249, 115, 22, 0.16);
+  --app-shadow: 0 22px 55px rgba(0, 0, 0, 0.34);
+  --app-shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.24);
+}
+
 html {
   scroll-behavior: smooth;
+  background: var(--app-bg);
 }
 
 body {
@@ -109,6 +128,13 @@ body {
   color: var(--app-ink);
 }
 
+html[data-theme="dark"] body {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(249, 115, 22, 0.14), transparent 28rem),
+    radial-gradient(circle at 88% 18%, rgba(14, 165, 233, 0.06), transparent 30rem),
+    linear-gradient(135deg, #080b11 0%, #0d121b 50%, #15100d 100%);
+}
+
 body::before {
   position: fixed;
   inset: 0;
@@ -116,8 +142,8 @@ body::before {
   pointer-events: none;
   content: "";
   background-image:
-    linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
+    linear-gradient(var(--app-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--app-grid) 1px, transparent 1px);
   background-size: 44px 44px;
   -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.52), transparent 76%);
   mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.52), transparent 76%);
@@ -296,8 +322,8 @@ button:disabled {
 input,
 select,
 textarea {
-  background: rgba(255, 255, 255, 0.76) !important;
-  border-color: rgba(15, 23, 42, 0.12) !important;
+  background: var(--app-input) !important;
+  border-color: var(--app-line) !important;
   border-radius: 14px !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
   color: var(--app-ink);
@@ -315,6 +341,108 @@ textarea:focus {
 input::placeholder,
 textarea::placeholder {
   color: rgba(100, 116, 139, 0.76);
+}
+
+.theme-toggle {
+  border-color: var(--app-line);
+  background: var(--app-surface-strong);
+  color: var(--app-ink);
+}
+
+.theme-toggle:hover {
+  border-color: rgba(249, 115, 22, 0.5);
+  color: var(--app-orange);
+}
+
+html[data-theme="dark"] .text-slate-950,
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] .text-slate-800,
+html[data-theme="dark"] .text-black {
+  color: var(--app-ink) !important;
+}
+
+html[data-theme="dark"] .text-slate-700,
+html[data-theme="dark"] .text-slate-600,
+html[data-theme="dark"] .text-slate-500,
+html[data-theme="dark"] .text-gray-700,
+html[data-theme="dark"] .text-gray-600,
+html[data-theme="dark"] .text-gray-500 {
+  color: var(--app-muted) !important;
+}
+
+html[data-theme="dark"] .border-white\/60,
+html[data-theme="dark"] .border-white\/80,
+html[data-theme="dark"] .border-slate-100,
+html[data-theme="dark"] .border-slate-200,
+html[data-theme="dark"] .border-slate-200\/70,
+html[data-theme="dark"] .border-slate-200\/80,
+html[data-theme="dark"] .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--app-line) !important;
+}
+
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-white\/50,
+html[data-theme="dark"] .bg-white\/55,
+html[data-theme="dark"] .bg-white\/65,
+html[data-theme="dark"] .bg-white\/70,
+html[data-theme="dark"] .bg-white\/75,
+html[data-theme="dark"] .bg-white\/80,
+html[data-theme="dark"] .bg-white\/90,
+html[data-theme="dark"] .bg-white\/95,
+html[data-theme="dark"] .bg-gray-50,
+html[data-theme="dark"] .bg-gray-100,
+html[data-theme="dark"] .bg-gray-200,
+html[data-theme="dark"] .bg-slate-50,
+html[data-theme="dark"] .bg-slate-50\/50,
+html[data-theme="dark"] .bg-slate-50\/80,
+html[data-theme="dark"] .bg-slate-100,
+html[data-theme="dark"] .bg-slate-100\/50 {
+  background: var(--app-surface) !important;
+}
+
+html[data-theme="dark"] .nexus-dropdown-panel {
+  background: #182130 !important;
+}
+
+html[data-theme="dark"] .nexus-table-head,
+html[data-theme="dark"] thead .bg-black,
+html[data-theme="dark"] tr.bg-black,
+html[data-theme="dark"] .bg-slate-900,
+html[data-theme="dark"] .bg-slate-950 {
+  background: #05070b !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .from-white,
+html[data-theme="dark"] .via-white,
+html[data-theme="dark"] .to-white,
+html[data-theme="dark"] .from-slate-50,
+html[data-theme="dark"] .to-slate-50,
+html[data-theme="dark"] .to-slate-100\/50 {
+  --tw-gradient-from: rgba(17, 24, 39, 0.95) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgba(17, 24, 39, 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), rgba(24, 33, 48, 0.9) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+
+html[data-theme="dark"] .hover\:bg-white:hover,
+html[data-theme="dark"] .hover\:bg-slate-50:hover,
+html[data-theme="dark"] .hover\:bg-slate-100:hover {
+  background: var(--app-surface-strong) !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #64748b;
+}
+
+html[data-theme="dark"] .shadow-slate-900\/5,
+html[data-theme="dark"] .shadow-slate-900\/10,
+html[data-theme="dark"] .shadow-slate-900\/20 {
+  --tw-shadow-color: rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] .bg-\[\#f7f4ef\] {
+  background: #111827 !important;
 }
 
 table {

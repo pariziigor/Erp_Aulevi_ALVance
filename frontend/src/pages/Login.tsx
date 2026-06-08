@@ -4,6 +4,7 @@ import { Lock, Mail, ShieldAlert } from 'lucide-react';
 import api from '../services/api';
 import { LoadingButton } from '../components/shared/FormComponents';
 import { PasswordInput } from '../components/shared/PasswordInput';
+import { ThemeToggle } from '../components/shared/ThemeToggle';
 import alvanceLogo from '../assets/alvance-login.svg';
 
 export const Login: React.FC = () => {
@@ -53,6 +54,8 @@ export const Login: React.FC = () => {
 
   return (
     <main className="page-enter relative min-h-screen overflow-hidden bg-[#0f0f0f] will-animate">
+      <ThemeToggle className="fixed right-5 top-5 z-[300]" />
+
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-32 top-[-12rem] h-[34rem] w-[34rem] rounded-full bg-orange-500/15 blur-3xl" />
         <div className="absolute bottom-[-16rem] right-[-12rem] h-[38rem] w-[38rem] rounded-full bg-orange-500/10 blur-3xl" />

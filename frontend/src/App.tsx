@@ -3,6 +3,8 @@ import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/useAuth';
 import { ToastProvider } from './components/shared/Toast';
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
+import { ThemeToggle } from './components/shared/ThemeToggle';
+import { ThemeProvider } from './context/ThemeContext';
 import { Login } from './pages/Login';
 import { ChangePassword } from './pages/ChangePassword';
 import { Clients } from './pages/Clients';
@@ -83,12 +85,15 @@ function DashboardPrincipal() {
             Ola, <span className="font-bold text-slate-950">{user?.name}</span> ({user?.role})
           </p>
         </div>
-        <button
-          onClick={logout}
-	          className="inline-flex w-fit items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-bold uppercase text-slate-700 shadow-sm backdrop-blur transition hover:border-orange-300 hover:bg-orange-500 hover:text-white md:self-end"
-        >
-          <LogOut size={16} /> Sair
-        </button>
+        <div className="flex items-center gap-3 md:self-end">
+          <ThemeToggle />
+          <button
+            onClick={logout}
+            className="inline-flex w-fit items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-bold uppercase text-slate-700 shadow-sm backdrop-blur transition hover:border-orange-300 hover:bg-orange-500 hover:text-white"
+          >
+            <LogOut size={16} /> Sair
+          </button>
+        </div>
       </header>
 
 	      <main className="grid grid-cols-1 gap-5 py-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
@@ -163,11 +168,13 @@ function AppContent() {
 function App() {
   return (
     <ErrorBoundary>
-      <ToastProvider>
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
-      </ToastProvider>
+      <ThemeProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </ToastProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
