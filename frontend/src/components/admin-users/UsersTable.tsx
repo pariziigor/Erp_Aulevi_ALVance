@@ -57,7 +57,7 @@ export function UsersTable({ loading, updatingUserId, users, onResetPassword, on
                     </span>
                     {systemUser.must_change_password && (
                       <span className="rounded-full border border-orange-200 bg-orange-50 px-2 py-1 text-xs font-bold uppercase text-orange-700">
-                        Senha temporaria
+                        Senha temporária
                       </span>
                     )}
                     {systemUser.password_reset_requested_at && (

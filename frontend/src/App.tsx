@@ -130,7 +130,7 @@ function DashboardPrincipal() {
         {user?.role === 'ADM' && (
           <div onClick={() => setActivePage('commercialSettings')} className={moduleCard}>
             <Settings className="text-orange-500 transition group-hover:scale-110" size={32} strokeWidth={2.5} />
-            <h2 className="text-lg font-extrabold uppercase text-slate-900">Configuracoes Comerciais</h2>
+            <h2 className="text-lg font-extrabold uppercase text-slate-900">Configurações Comerciais</h2>
           </div>
         )}
       </main>

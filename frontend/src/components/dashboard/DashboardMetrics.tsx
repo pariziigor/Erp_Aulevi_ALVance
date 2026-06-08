@@ -25,7 +25,7 @@ export function DashboardMetrics({ stats, formatCurrency }: DashboardMetricsProp
 
   const cards = useMemo(() => [
     {
-      label: 'Orcado no mes',
+      label: 'Orçado no mês',
       icon: <TrendingUp className="text-orange-500" size={20} />,
       value: formatCurrency(stats.valor_total_orcado_mes),
       helper: 'pipeline comercial real',
@@ -37,13 +37,13 @@ export function DashboardMetrics({ stats, formatCurrency }: DashboardMetricsProp
       helper: 'base compartilhada',
     },
     {
-      label: 'Orcamentos',
+      label: 'Orçamentos',
       icon: <FileText className="text-orange-500" size={20} />,
       value: stats.total_orcamentos,
       helper: 'emitidos no ERP',
     },
     {
-      label: 'Conversao',
+      label: 'Conversão',
       icon: <Activity className="text-orange-500" size={20} />,
       value: `${stats.taxa_conversao}%`,
       helper: 'aprovados sobre emitidos',
@@ -65,20 +65,20 @@ export function DashboardMetrics({ stats, formatCurrency }: DashboardMetricsProp
         : 'sem pedidos aprovados',
     },
     {
-      label: 'Regiao lider',
+      label: 'Região líder',
       icon: <MapPin className="text-orange-500" size={20} />,
       value: stats.regiao_maior_vendas?.region || '-',
       helper: stats.regiao_maior_vendas
         ? `${formatCurrency(stats.regiao_maior_vendas.value)} em ${stats.regiao_maior_vendas.orders} pedidos`
-        : 'sem vendas por regiao',
+        : 'sem vendas por região',
     },
     {
-      label: 'Tempo ate pedido',
+      label: 'Tempo até pedido',
       icon: <Timer className="text-orange-500" size={20} />,
       value: stats.tempo_medio_conversao_horas
         ? `${(stats.tempo_medio_conversao_horas / 24).toFixed(1)} dias`
         : '-',
-      helper: 'media de conversao',
+      helper: 'média de conversão',
     },
   ], [formatCurrency, stats]);
 

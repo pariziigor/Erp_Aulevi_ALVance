@@ -40,26 +40,26 @@ export function DashboardSummaryPanels({ stats, formatCurrency }: DashboardSumma
         </div>
 
         <div className={panelClass}>
-          <h3 className="mb-4 border-b border-slate-200 pb-3 text-sm font-extrabold uppercase text-slate-900">Categoria Lider</h3>
+          <h3 className="mb-4 border-b border-slate-200 pb-3 text-sm font-extrabold uppercase text-slate-900">Categoria Líder</h3>
           <div className="break-words text-4xl font-extrabold text-slate-950">{stats.categoria_maior_faturamento || '-'}</div>
-          <p className="mt-2 text-xs font-medium uppercase text-slate-500">Maior faturamento nos itens orcados.</p>
+          <p className="mt-2 text-xs font-medium uppercase text-slate-500">Maior faturamento nos itens orçados.</p>
         </div>
 
         <div className={panelClass}>
           <h3 className="mb-4 flex items-center gap-2 border-b border-slate-200 pb-3 text-sm font-extrabold uppercase text-slate-900">
-            <Clock className="text-orange-500" size={16} /> Tempo Medio de Conversao
+            <Clock className="text-orange-500" size={16} /> Tempo Médio de Conversão
           </h3>
           <div className="text-4xl font-extrabold text-slate-950">
             {formatConversionTime(Number(stats.tempo_medio_conversao_horas || 0))}
           </div>
-          <p className="mt-2 text-xs font-medium uppercase text-slate-500">Media entre emissao e conversao em pedido.</p>
+          <p className="mt-2 text-xs font-medium uppercase text-slate-500">Média entre emissão e conversão em pedido.</p>
         </div>
       </div>
 
       <div className={panelClass}>
         <div className="mb-4 flex flex-col gap-3 border-b border-slate-200 pb-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h3 className="text-sm font-extrabold uppercase text-slate-900">Analises Detalhadas</h3>
+            <h3 className="text-sm font-extrabold uppercase text-slate-900">Análises Detalhadas</h3>
             <p className="mt-1 text-xs font-medium uppercase text-slate-500">Navegue por bloco para reduzir rolagem.</p>
           </div>
           <div className="grid grid-cols-3 gap-2 rounded-2xl border border-slate-200 bg-white/65 p-1">
@@ -141,7 +141,7 @@ export function DashboardSummaryPanels({ stats, formatCurrency }: DashboardSumma
           {activeTab === 'products' && (
             <div className="grid grid-cols-1 gap-3 text-xs text-slate-600 md:grid-cols-2 xl:grid-cols-5">
               {stats.produtos_mais_orcados.length === 0 ? (
-                <p className="uppercase text-slate-500">Sem itens orcados ainda.</p>
+                <p className="uppercase text-slate-500">Sem itens orçados ainda.</p>
               ) : (
                 stats.produtos_mais_orcados.map((product) => (
                   <p key={product.codigo} className="flex items-center gap-2 rounded-xl bg-slate-50/80 px-3 py-2">

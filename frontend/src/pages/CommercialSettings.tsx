@@ -28,7 +28,7 @@ function OptionSection({ title, endpoint, options, onRefresh }: OptionSectionPro
       await onRefresh();
       addToast('Opcao comercial criada.', 'success');
     } catch (error) {
-      addToast(error instanceof Error ? error.message : 'Erro ao criar opcao.', 'error');
+      addToast(error instanceof Error ? error.message : 'Erro ao criar opção.', 'error');
     } finally {
       setSaving(false);
     }
@@ -39,7 +39,7 @@ function OptionSection({ title, endpoint, options, onRefresh }: OptionSectionPro
       await api.patch(`${endpoint}/${option.id}`, { is_active: !option.is_active });
       await onRefresh();
     } catch (error) {
-      addToast(error instanceof Error ? error.message : 'Erro ao atualizar opcao.', 'error');
+      addToast(error instanceof Error ? error.message : 'Erro ao atualizar opção.', 'error');
     }
   }
 
@@ -96,10 +96,10 @@ export function CommercialSettings({ onBack }: { onBack: () => void }) {
         <button onClick={onBack} className="nexus-back-button">
           <ArrowLeft size={16} /> Voltar ao menu
         </button>
-        <h2 className="nexus-title">Configuracoes Comerciais</h2>
+        <h2 className="nexus-title">Configurações Comerciais</h2>
       </div>
       {loading ? (
-        <div className="nexus-panel py-12 text-center text-xs font-semibold uppercase text-slate-500">Carregando configuracoes...</div>
+        <div className="nexus-panel py-12 text-center text-xs font-semibold uppercase text-slate-500">Carregando configurações...</div>
       ) : (
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <OptionSection title="Condicoes de pagamento" endpoint="/commercial-options/payment-conditions" options={paymentOptions} onRefresh={loadOptions} />

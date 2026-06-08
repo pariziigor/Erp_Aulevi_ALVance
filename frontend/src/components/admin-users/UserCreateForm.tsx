@@ -43,7 +43,7 @@ export function UserCreateForm({
         <input required type="email" value={email} onChange={(event) => onEmailChange(event.target.value)} className="w-full border-2 border-black p-2 text-sm focus:outline-none" />
       </div>
       <div>
-        <label className="block text-xs font-black uppercase mb-2">Senha Temporaria</label>
+        <label className="block text-xs font-black uppercase mb-2">Senha Temporária</label>
         <PasswordInput
           value={password}
           onChange={onPasswordChange}

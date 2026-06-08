@@ -27,7 +27,7 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       const response = await api.get('/auth/users');
       setUsersList(response.data);
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Erro ao carregar usuarios.', 'error');
+      addToast(err instanceof Error ? err.message : 'Erro ao carregar usuários.', 'error');
     } finally {
       setLoading(false);
     }
@@ -53,10 +53,10 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       setEmail('');
       setPassword('');
       setRole('SELLER');
-      addToast('Usuario criado com senha temporaria. A troca sera exigida no primeiro acesso.', 'success');
+      addToast('Usuário criado com senha temporária. A troca será exigida no primeiro acesso.', 'success');
       fetchUsers();
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Erro ao criar usuario.', 'error');
+      addToast(err instanceof Error ? err.message : 'Erro ao criar usuário.', 'error');
     } finally {
       setSaving(false);
     }
@@ -67,10 +67,10 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
     try {
       await api.patch(`/auth/users/${user.id}`, payload);
-      addToast('Permissao do usuario atualizada e registrada no log de auditoria.', 'success');
+      addToast('Permissão do usuário atualizada e registrada no log de auditoria.', 'success');
       fetchUsers();
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Erro ao atualizar usuario.', 'error');
+      addToast(err instanceof Error ? err.message : 'Erro ao atualizar usuário.', 'error');
     } finally {
       setUpdatingUserId(null);
     }
@@ -86,7 +86,7 @@ export const AdminUsers: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       await api.post(`/auth/users/${resettingUser.id}/password/reset`, {
         temporary_password: temporaryPassword,
       });
-      addToast('Senha temporaria redefinida. O usuario devera troca-la no proximo acesso.', 'success');
+      addToast('Senha temporária redefinida. O usuário deverá trocá-la no próximo acesso.', 'success');
       setResettingUser(null);
       setTemporaryPassword('');
       fetchUsers();

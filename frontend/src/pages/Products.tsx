@@ -23,7 +23,7 @@ export const Products: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       const response = await api.get('/products');
       setProducts(response.data);
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Erro ao buscar catalogo de produtos.', 'error');
+      addToast(err instanceof Error ? err.message : 'Erro ao buscar catálogo de produtos.', 'error');
     } finally {
       setLoading(false);
     }
@@ -112,7 +112,7 @@ export const Products: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <button onClick={onBack} className="nexus-back-button">
           <ArrowLeft size={16} /> Voltar ao menu
         </button>
-        <h2 className="nexus-title">Catalogo de Estruturas & Insumos</h2>
+        <h2 className="nexus-title">Catálogo de Estruturas & Insumos</h2>
         <div className="nexus-badge">
           <Layers size={14} /> Total: {filteredProducts.length} itens
         </div>

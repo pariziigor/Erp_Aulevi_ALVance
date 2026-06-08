@@ -114,3 +114,5 @@ logs/
 *.exe
 *.dll
 .DS_Store
+
+*.md

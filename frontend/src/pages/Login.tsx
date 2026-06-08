@@ -23,7 +23,7 @@ export const Login: React.FC = () => {
     try {
       await login(email, password);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Falha na conexao com o servidor.';
+      const errorMessage = err instanceof Error ? err.message : 'Falha na conexão com o servidor.';
       setError(errorMessage);
     } finally {
       setIsSubmitting(false);
