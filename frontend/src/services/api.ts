@@ -1,6 +1,8 @@
 // frontend/src/services/api.ts
 import axios, { AxiosError } from 'axios';
 
+export const AUTH_UNAUTHORIZED_EVENT = 'alvance:auth-unauthorized';
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api',
 });
@@ -38,9 +40,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('@AuleviNexus:token');
       localStorage.removeItem('@AuleviNexus:user');
-      if (window.location.pathname !== '/') {
-        window.location.assign('/');
-      }
+      window.dispatchEvent(new Event(AUTH_UNAUTHORIZED_EVENT));
     }
 
     return Promise.reject(new Error(message));

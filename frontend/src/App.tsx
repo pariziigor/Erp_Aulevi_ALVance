@@ -14,13 +14,14 @@ import { Dashboard } from './pages/Dashboard';
 import { AdminUsers } from './pages/AdminUsers';
 import { SellerDashboard } from './pages/SellerDashboard';
 import { CommercialSettings } from './pages/CommercialSettings';
+import { HomeOverview } from './components/home/HomeOverview';
 import { BarChart3, FileText, LayoutGrid, LogOut, Package, Settings, Shield, Users } from 'lucide-react';
 
 function DashboardPrincipal() {
   const { logout, user } = useAuth();
   const [activePage, setActivePage] = useState<'menu' | 'crm' | 'products' | 'quotes' | 'dashboard' | 'adminUsers' | 'sellerDashboard' | 'commercialSettings'>('menu');
   const pageShell = 'page-enter min-h-screen px-4 py-6 will-animate sm:px-6 md:px-10 lg:px-16 lg:py-12';
-	  const moduleCard = 'stagger-item hover-lift hover-glow group flex min-h-40 cursor-pointer flex-col justify-between rounded-2xl border border-white/60 bg-white/70 p-5 shadow-xl shadow-slate-900/5 backdrop-blur-xl transition-all duration-200 hover:border-orange-300/60 hover:bg-white/90 hover:shadow-2xl hover:shadow-orange-500/10 sm:p-6';
+	  const moduleCard = 'stagger-item hover-lift hover-glow group flex min-h-24 cursor-pointer items-center gap-4 rounded-2xl border border-white/60 bg-white/70 p-4 shadow-xl shadow-slate-900/5 backdrop-blur-xl transition-all duration-200 hover:border-orange-300/60 hover:bg-white/90 hover:shadow-2xl hover:shadow-orange-500/10';
 
   if (activePage === 'crm') {
     return <div className={pageShell}><Clients onBack={() => setActivePage('menu')} /></div>;
@@ -74,7 +75,7 @@ function DashboardPrincipal() {
   }
 
   return (
-    <div className="page-enter flex min-h-screen flex-col justify-between px-4 py-6 will-animate sm:px-6 md:px-10 lg:px-16 lg:py-12">
+    <div className="page-enter flex min-h-screen flex-col px-4 py-6 will-animate sm:px-6 md:px-10 lg:px-16 lg:py-12">
       <header className="fade-in-down flex flex-col gap-5 rounded-3xl border border-white/60 bg-white/55 p-5 shadow-xl shadow-slate-900/5 backdrop-blur-xl md:flex-row md:items-end md:justify-between">
         <div>
           <div className="badge-pop-in mb-3 inline-flex rounded-full border border-orange-200 bg-orange-50/80 px-3 py-1 text-[11px] font-bold uppercase text-orange-700">
@@ -96,7 +97,14 @@ function DashboardPrincipal() {
         </div>
       </header>
 
-	      <main className="grid grid-cols-1 gap-5 py-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <main className="grid flex-1 grid-cols-1 gap-8 py-8 lg:grid-cols-[minmax(250px,320px)_minmax(0,1fr)] lg:items-start">
+        <aside className="space-y-4 lg:sticky lg:top-8">
+          <div>
+            <p className="text-xs font-bold uppercase text-orange-600">Navegação</p>
+            <h2 className="mt-1 text-2xl font-extrabold text-slate-950">Módulos do sistema</h2>
+            <p className="mt-1 text-sm text-slate-500">Acesse as áreas operacionais do ALVance.</p>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
         <div onClick={() => setActivePage('crm')} className={moduleCard}>
           <Users className="text-orange-500 transition group-hover:scale-110" size={32} strokeWidth={2.5} />
           <h2 className="text-lg font-extrabold uppercase text-slate-900">CRM Clientes</h2>
@@ -138,9 +146,15 @@ function DashboardPrincipal() {
             <h2 className="text-lg font-extrabold uppercase text-slate-900">Configurações Comerciais</h2>
           </div>
         )}
+          </div>
+        </aside>
+
+        <div className="min-w-0">
+          {user && <HomeOverview userId={user.id} role={user.role} />}
+        </div>
       </main>
 
-      <footer className="fade-in-up rounded-full border border-white/60 bg-white/50 px-4 py-3 text-center text-xs font-medium text-slate-500 shadow-sm backdrop-blur">
+      <footer className="fade-in-up mt-4 rounded-full border border-white/60 bg-white/50 px-4 py-3 text-center text-xs font-medium text-slate-500 shadow-sm backdrop-blur">
         ALVance v1.0.0 / 2026
       </footer>
     </div>

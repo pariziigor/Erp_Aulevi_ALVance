@@ -1,6 +1,6 @@
 // frontend/src/context/AuthContext.tsx
-import React, { createContext, useState } from 'react';
-import api from '../services/api';
+import React, { createContext, useEffect, useState } from 'react';
+import api, { AUTH_UNAUTHORIZED_EVENT } from '../services/api';
 
 interface User {
   id: string;
@@ -37,14 +37,20 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(getInitialUser());
 
+  useEffect(() => {
+    const handleUnauthorized = () => setUser(null);
+    window.addEventListener(AUTH_UNAUTHORIZED_EVENT, handleUnauthorized);
+    return () => window.removeEventListener(AUTH_UNAUTHORIZED_EVENT, handleUnauthorized);
+  }, []);
+
   async function login(email: string, password: string) {
     const response = await api.post('/auth/login', { email, password });
     
     const { access_token, user: userResponse } = response.data;
 
-    setUser(userResponse);
     localStorage.setItem('@AuleviNexus:token', access_token);
     localStorage.setItem('@AuleviNexus:user', JSON.stringify(userResponse));
+    setUser(userResponse);
   }
 
   async function changePassword(currentPassword: string, newPassword: string) {
