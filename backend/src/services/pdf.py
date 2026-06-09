@@ -1,37 +1,87 @@
-# backend/src/services/pdf.py
 import os
+import subprocess
+from decimal import Decimal
 from io import BytesIO
+from pathlib import Path
+
 from fastapi import HTTPException
 from jinja2 import Environment, FileSystemLoader
-from xhtml2pdf import pisa
+
 
 class PDFService:
+    _BASE_DIR = Path(__file__).resolve().parents[2]
+    _RENDERER_PATH = _BASE_DIR / "pdf-renderer" / "render-pdf.cjs"
+
+    @staticmethod
+    def _format_brl(value) -> str:
+        amount = Decimal(str(value or 0))
+        formatted = f"{amount:,.2f}".replace(",", "_").replace(".", ",").replace("_", ".")
+        return f"R$ {formatted}"
+
+    @staticmethod
+    def _commercial_label(value) -> str:
+        if not value:
+            return "A combinar"
+        labels = {
+            "A_VISTA": "À vista",
+            "30_DIAS": "30 dias",
+            "30_60": "30 / 60 dias",
+            "30_60_90": "30 / 60 / 90 dias",
+            "ENTRADA_PARCELAS": "Entrada + parcelas",
+            "ENTREGA_LOCAL": "Entrega local",
+            "FRETE_INCLUSO": "Frete incluso",
+            "FRETE_A_CALCULAR": "Frete a calcular",
+        }
+        return labels.get(str(value), str(value).replace("_", " ").title())
+
     @staticmethod
     def gerar_pdf_orcamento(quote, client, items_details) -> BytesIO:
         """
         Compila o template HTML com os dados dinâmicos do banco
-        e converte em um arquivo PDF binário na memória.
+        e o converte em PDF usando o Chromium gerenciado pelo Puppeteer.
         """
-        # Caminho absoluto para a pasta de templates
         base_dir = os.path.dirname(os.path.dirname(__file__))
         templates_dir = os.path.join(base_dir, "templates")
-        
+
         env = Environment(loader=FileSystemLoader(templates_dir))
+        env.filters["brl"] = PDFService._format_brl
+        env.filters["commercial_label"] = PDFService._commercial_label
         template = env.get_template("quote_pdf.html")
-        
-        # Renderiza o HTML mesclando os dados do banco
+
         html_content = template.render(
             quote=quote,
             client=client,
-            items_details=items_details
+            items_details=items_details,
         )
-        
-        # Cria o arquivo PDF na memória (Buffer)
-        pdf_buffer = BytesIO()
-        pisa_status = pisa.CreatePDF(BytesIO(html_content.encode("utf-8")), dest=pdf_buffer)
-        
-        if pisa_status.err:
-            raise HTTPException(status_code=500, detail="Erro interno ao renderizar o PDF comercial.")
-            
-        pdf_buffer.seek(0)
-        return pdf_buffer
+
+        node_binary = os.getenv("PDF_NODE_BINARY", "node")
+        timeout = int(os.getenv("PDF_RENDER_TIMEOUT_SECONDS", "60"))
+
+        try:
+            result = subprocess.run(
+                [node_binary, str(PDFService._RENDERER_PATH)],
+                input=html_content.encode("utf-8"),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+                timeout=timeout,
+            )
+        except FileNotFoundError as exc:
+            raise HTTPException(
+                status_code=500,
+                detail="Node.js não foi encontrado para renderizar o PDF.",
+            ) from exc
+        except subprocess.TimeoutExpired as exc:
+            raise HTTPException(
+                status_code=504,
+                detail="A renderização do PDF excedeu o tempo limite.",
+            ) from exc
+
+        if result.returncode != 0 or not result.stdout.startswith(b"%PDF"):
+            renderer_error = result.stderr.decode("utf-8", errors="replace").strip()
+            raise HTTPException(
+                status_code=500,
+                detail=renderer_error or "Erro interno ao renderizar o PDF comercial.",
+            )
+
+        return BytesIO(result.stdout)

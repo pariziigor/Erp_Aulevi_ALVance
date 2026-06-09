@@ -1,0 +1,12 @@
+{
+  "name": "alvance-pdf-renderer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Puppeteer renderer for ALVance commercial PDFs",
+  "scripts": {
+    "test": "node render-pdf.cjs --check"
+  },
+  "dependencies": {
+    "puppeteer": "^24.0.0"
+  }
+}
